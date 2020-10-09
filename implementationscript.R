@@ -45,29 +45,35 @@ tweets_covid <-search_tweets("#COVID", n= 2000, include_rts = TRUE, lang = "en")
 tweets_2020 <-search_tweets("#2020", n= 2000, include_rts = TRUE, lang = "en")
 tweets_cure  <-search_tweets("#cure", n= 2000, include_rts = TRUE, lang = "en")
 tweets_lockdown  <-search_tweets("#lockdown", n= 2000, include_rts = TRUE, lang = "en")
-
 tweets_covid19uk  <-search_tweets("#covid19uk", n= 2000, include_rts = TRUE, lang = "en")
-tweets_covid19  <-search_tweets("#COVID-19", n= 2000, include_rts = TRUE, lang = "en")
-tweets_covid19UK  <-search_tweets("#covid19UK", n= 2000, include_rts = TRUE, lang = "en")	
 tweets_govuk  <-search_tweets("#govuk", n= 2000, include_rts = TRUE, lang = "en")
-tweets_govUK <-search_tweets("#govUK", n= 2000, include_rts = TRUE, lang = "en")
 tweets_hoax  <-search_tweets("#hoax", n= 2000, include_rts = TRUE, lang = "en")
-tweets_coronauk  <-search_tweets("#coronavirusuk", n= 2000, include_rts = TRUE, lang = "en")#coronavirusUK
+tweets_coronauk  <-search_tweets("#coronavirusuk", n= 2000, include_rts = TRUE, lang = "en")
 
 
 
 # we will bind all the tweets in to one data frame
 
-alltweets <- bind_rows(tweets_coronauk,tweets_hoax,tweets_govUK,
-                       tweets_govuk,tweets_GovUK,tweets_covid19UK,
-                       tweets_covid19,tweets_covid19uk,tweets_lockdown,
-                       tweets_cure,tweets_2020,tweets_corona,tweets_covid19, .id = NULL)
+alltweets <- bind_rows(tweets_coronauk,tweets_hoax,tweets_govuk,tweets_lockdown,
+                       tweets_cure,tweets_2020,tweets_covid,tweets_corona,tweets_covid19)
 alltweets
 
 # To view the collected data, We load library dplyr and use the glimpse function
-hist(alltweets$followers_count, xlab = "followers count", xlim = c(0,10000), main = "total followers in dataset", probability = TRUE)
-hist(alltweets$retweet_count)
+hist(alltweets$followers_count, xlab = "followers count", xlim = c(0,100), main = "total followers in dataset", probability = TRUE)
+hist(alltweets$retweet_count, xlab = "retweets count", xlim = c(0,100), main = "total retweets in dataset", probability = TRUE)
 
+#ploting followers count against retweets count
+ggplot(alltweets, aes(followers_count,retweet_count))+
+  geom_point() +
+  scale_x_continuous(labels = NULL)+
+  scale_y_continuous(labels = NULL)+
+  labs(title = "Distribution of followers to retweet",
+       subtitle = "shows the relationship the user and tweeted message",
+       caption = "Data from Twitter.com"
+       )
+
+
+  
 # continous variables
 str(alltweets)
 mean(alltweets$followers_count)
@@ -75,6 +81,8 @@ mean(alltweets$reply_count)
 sd(alltweets$followers_count)
 
 stable <- table(alltweets$screen_name)
+stable
+ftable <- table(alltweets$followers_count)
 max(ftable)
 min(ftable)
 
@@ -86,43 +94,35 @@ following
 
 count(alltweets,"screen_name")
 plot(alltweets$followers_count)
-plot(alltweets$retweet_count)
-type.frame <- data.frame(ftable)
-colnames(type.frame)<- c("followers","frequency")
-type.frame
-
-ggplot(type.frame,aes(x= "frequency", y = "followers"(ftable,frequency)))+
-  geom_point(size = 4)+
-  theme_bw()+
-  theme(panel.grid.major.x = element_blank(),panel.grid.major.y = element_line(color = "black",linetype = "dotted"))+
-  labs(y = "followers")
+# verifying that all variables in observation are complete
 count(alltweets,"user_id")
 count(alltweets)
 count(alltweets, "followers_count")
 counts <- table(alltweets$screen_name, useNA = "ifany")
 names(counts)[is.na(names(counts))] <- "NA"
-pie(counts, main = "Distribution")
+
+# confirming there are no empty values
 alltweets %>% filter(is.na(screen_name))
 alltweets %>% filter(is.na(followers_count))
 alltweets %>% filter(is.na(verified))
 alltweets %>% filter(is.na(retweet_count))
 alltweets %>% filter(is.na(text))
 # dealing with duplicate values
+
+# determining users with same number of followers
 duplicate <-data.frame(ftable)
 duplicate[duplicate$Freq>1,]
 alltweets[alltweets$followers_count %in% duplicate$Var1[duplicate$Freq>1],]
 
-# This is to show that there are duplicate text
+# This is to show if there are duplicate text
 dupl <-data.frame(table(alltweets$text))
 dupl[dupl$Freq>1,]
-alltweets[alltweets$followers_count %in% dupl$Var1[dupl$Freq>1],]
+alltweets[alltweets$text %in% dupl$Var1[dupl$Freq>1],]
 
 # To show the distribution of followers
-ftable <-table(alltweets$followers_count)
-barplot(ftable, ylim = c(0,500),xlab = "followers_count", ylab = "frequency", axis.lty = "solid", space = 2.5)
+barplot(ftable, ylim = c(0,50),xlab = "followers_count", ylab = "frequency", axis.lty = "solid", space = 2.5)
 
 
-plot(alltweets, xlab())
 glimpse(alltweets)
 # creating tibble of tweet text
 raw_text <- tibble(section = alltweets$text)
@@ -138,14 +138,15 @@ timetweet <- ts_plot(alltweets, "4 hours ") +
     subtitle = "Twitter status (tweet) counts aggregated using Four-hour intervals",
     caption = "\nSource: Data collected from Twitter's REST API via rtweet"
   )
-
+# determining the volume of all the followers
 sum(alltweets$followers_count)
 
+# checking when tweets were created
 createdtweet <- table(alltweets$created_at)
 retweetable <- table(alltweets$retweet_count)
 followtweet <- table(alltweets$followers_count)
 
-# we created a new dataframe containing the components to work with
+# we created a new dataframe containing the few components to work with
 twdf <- alltweets[,c("screen_name","followers_count","text","media_type","retweet_count","verified","lang"), values_drop_na = TRUE] 
 twdf
 # retweet is a tweet re-shared by another user
@@ -153,8 +154,8 @@ twdf
 # it helps to identify trends and popularity of a topic
 # Sorting dataframe based on followers count in descending order
 
-
 # Sorted new dataframe based on followers count in descending order
+# to determine users with largest follows
 sorttwdf <- arrange(twdf, desc(twdf$followers_count))
 sorttwdf
 # dealing with duplicate tweets
@@ -163,14 +164,7 @@ sortunique <- unique(sorttwdf, by ="text")
 sortunique
 # At this stage data has been collected and reformated to the needed component.
 
-texttable <- table(raw_text$section)
-
 # created regular expressions to tidy data
-
-replace_reg1 <- "https://t.co/[A-Za-z\\d]+|"
-replace_reg2 <- "http://[A-Za-z\\d]+|&amp;|&lt;|&gt;|RT|https"
-replace_reg <- paste0(replace_reg1, replace_reg2)
-unnest_reg <- "([^A-Za-z_\\d#@']|'(?![A-Za-z_\\d#@]))"
 
 ##################################################################
 ## Latent Dirichlet Allocation (LDA) approach
@@ -190,12 +184,11 @@ replace_reg2 <- "http://[A-Za-z\\d]+|&amp;|&lt;|&gt;|RT|https"
 replace_reg <- paste0(replace_reg1, replace_reg2)
 unnest_reg <- "([^A-Za-z_\\d#@']|'(?![A-Za-z_\\d#@]))"
 
-str_replace_all(data$text,unnest_reg,"")
-
 str_replace_all(data$text,replace_reg,"")
+str_replace_all(data$text,unnest_reg,"")
+str_replace_all(data$text,replace_reg1,"")
+str_replace_all(data$text,replace_reg2,"")
 
-
-data$text <- sub(replace_reg1, data$text)
 # now we tokenize
 text_cleaning_tokens <- data %>% 
   tidytext::unnest_tokens(word, text)
@@ -341,7 +334,7 @@ plot(model$hclust)
 
 #visualising topics of words based on the max value of phi
 
-set.seed(123456)
+set.seed(1234)
 
 
 final_summary_words <- data.frame(top_terms = t(model$top_terms))
@@ -353,6 +346,7 @@ rownames(final_summary_words) <- 1:nrow(final_summary_words)
 final_summary_words <- final_summary_words %>% melt(id.vars = c("topic"))
 
 final_summary_words <- final_summary_words %>% rename(word = value) %>% select(-variable)
+
 
 final_summary_words <- final_summary_words %>% group_by(topic,word)
 
