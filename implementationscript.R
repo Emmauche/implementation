@@ -3,7 +3,7 @@ install.packages("httpuv")
 install.packages("textmineR")
 install.packages("GGally")
 install.packages("data.table")
-library("data.table")
+
 library(GGally)
 library(textmineR)
 library(rtweet)
