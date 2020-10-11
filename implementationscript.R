@@ -4,7 +4,14 @@ install.packages("textmineR")
 install.packages("GGally")
 install.packages("data.table")
 install.packages(ggrepe)
+install.packages("esquisse") 
+install.packages("rvg")
+install.packages("officer")
 
+
+??esquisse
+library(rvg)
+library(esquisse)
 library(GGally)
 library(textmineR)
 library(rtweet)
@@ -481,3 +488,4 @@ plot(Volume$followers_count,Volume$retweet_count)
 
 #############################################################################
 
+esquisse::esquisser()
