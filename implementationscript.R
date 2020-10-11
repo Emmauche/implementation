@@ -3,6 +3,7 @@ install.packages("httpuv")
 install.packages("textmineR")
 install.packages("GGally")
 install.packages("data.table")
+install.packages(ggrepe)
 
 library(GGally)
 library(textmineR)
@@ -17,8 +18,9 @@ library(readr)
 library(reshape2)
 library(wordcloud)
 library(lubridate)
-??Stringi
-??gsubfn
+library(scales)
+library(ggrepel)
+
 
 
 # streaming twitter data
@@ -411,6 +413,14 @@ b <- alltweets$favourites_count
 
 tweet<- final_summary_words
 
+
+
+alltweets.subset <- subset(alltweets, select = c(followers_count,retweet_count,screen_name))
+ggpairs(alltweets.subset)
+
+
+# showing frequency of words 
+
 Volume <- alltweets %>%
   group_by(screen_name) %>%
   count(followers_count,retweet_count, sort = TRUE) %>%
@@ -418,36 +428,55 @@ Volume <- alltweets %>%
               group_by(screen_name) %>%
               summarise(total = n())) %>%
   mutate(freq = n/total)
-alltweets.subset <- subset(alltweets, select = c(followers_count,retweet_count,screen_name))
-ggpairs(alltweets.subset)
+# volume of followers to Number of retweets
+my.scale_aes <- list(
+  scale_y_continuous(breaks = extended_breaks()),
+  scale_y_continuous(breaks = extended_breaks()),
+  scale_color_manual(values = c("black", "red"))
+)
+
+ggplot(data = Volume[1:100,],
+       aes(retweet_count, followers_count, cut == "Ideal" )) +
+  geom_point() +
+  geom_smooth(se = FALSE)+
+  my.scale_aes +
+  labs(
+    title = "Volume of twwiter users tweeting about Covid-19 and their followers",
+    subtitle = "Relation between Followers and retweets",
+    caption = "Data from twitter.com complied by Emmanuel"
+  )
+
+ggplot(data = Volume[1:100,],
+       aes(retweet_count, followers_count, cut == "Ideal" )) +
+  geom_point() +
+  geom_smooth(se = FALSE)+
+  my.scale_aes +
+  theme_bw()+
+  labs(
+    title = "Volume of twwiter users tweeting about Covid-19 and their followers",
+    subtitle = "Relation between Followers and retweets",
+    caption = "Data from twitter.com complied by Emmanuel"
+      )
+# saving my plot
+ggsave("my-plot.pdf")
+#
+fig.show = "hold"
+# Total number of retweets
+sum(alltweets$is_retweet)
+sum(alltweets$retweet_count)
+ggplot(alltweets, aes(verified, hwy)) +
+  geom_point(aes(colour = class)) +
+  scale_x_continuous() +
+  scale_y_continuous() +
+  scale_colour_discrete()
+top_words <- twdf%>%
+  group_by(text) %>%
+  filter(row_number(desc(followers_count)) == 1)
+
+plot(top_words)
 
 
-# showing frequency of words 
-frequency <- tweet %>%
-  group_by(topic) %>%
-  count(word, sort = TRUE) %>%
-  left_join(tweet %>%
-              group_by(topic) %>%
-              summarise(total = n())) %>%
-  mutate(freq = n/total)
-
-
-
-frequency
-
-library(scales)
-aes
-ggplot(frequency, aes(x = "Word", y = "topic")) +
-  geom_jitter(alpha = 0.1, size = 2.5, width = 0.25, height = 0.25) +
-  geom_text(aes(label = tweet$topic), check_overlap = TRUE, vjust = 1.5) +
-  scale_x_log10(labels = percent_format(100)) +
-  scale_y_log10(labels = percent_format(100)) +
-  geom_abline(color = "red")
-
-
-
-frequency
-
+plot(Volume$followers_count,Volume$retweet_count)
 
 
 #############################################################################
