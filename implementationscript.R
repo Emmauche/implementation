@@ -114,7 +114,117 @@ colnames(following) <- c("followers", "retweets")
 following
 
 count(alltweets,"screen_name")
-plot(alltweets$followers_count)
+count(alltweets,"retweet_count")
+
+# retweet details
+alltweets %>%
+  ggplot() +
+  aes(x = created_at, y = retweet_count) +
+  geom_line(size = 1L, colour = "#0c4c8a") +
+  theme_minimal() +
+  ggplot2::labs(
+    x = "Date of reation", y ="Times retweeted",
+    title = "Retweet activity of covid related topics based on collected data",
+    subtitle = "Twitter retweet counts ",
+    caption = "\nSource: Data collected from Twitter's REST API via rtweet"
+  )
+
+# followers details
+alltweets %>%
+  ggplot() +
+  aes(x = created_at, y = followers_count) +
+  geom_line(size = 1L, colour = "#0c4c8a") +
+  theme_minimal()+
+  ggplot2::labs(
+    x = "Date of creation", y = "Number of followers",
+    title = "Followers frequency based on collected data",
+    subtitle = "Followers count recorded based on collected data ",
+    caption = "\nSource: Data collected from Twitter's REST API via rtweet"
+  )
+
+# Number of verified users
+ sum(alltweets$verified)
+# Relationship between status count and retweet counts
+ alltweets %>%
+   ggplot() +
+   aes(x = statuses_count, y = retweet_statuses_count) +
+   geom_point(size = 1L, colour = "#0c4c8a") +
+   theme_minimal()+
+ ggplot2::labs(
+  x = " Status Count", y = " No of retweets",
+  title = "Followers frequency based on collected data",
+  subtitle = "Followers retweet activity recorded based on collected data ",
+  caption = "\nSource: Data collected from Twitter's REST API via rtweet"
+)
+ 
+ # Relationship between status and retweet
+ alltweets %>%
+   ggplot() +
+   aes(x = quoted_friends_count, y = quoted_retweet_count) +
+   geom_point(size = 1L, colour = "#0c4c8a") +
+   theme_minimal()+
+   ggplot2::labs(
+     x = "Friends", y = "retweets",
+     title = "Details about friends and retweet based on collected data",
+     subtitle = "Friends and retweet activity record based on collected data ",
+     caption = "\nSource: Data collected from Twitter's REST API via rtweet"
+   )
+# Relations between retweet and retweet followers
+ alltweets %>%
+   ggplot() +
+   aes(x = retweet_followers_count, y = retweet_friends_count) +
+   geom_point(size = 1L, colour = "#0c4c8a") +
+   theme_minimal()+
+ ggplot2::labs(
+   x = "Followers retweet", y = "followers friends",
+   title = "Details of the reach of retweeted message based on collected data",
+   subtitle = "Followers retweet activity record based on collected data ",
+   caption = "\nSource: Data collected from Twitter's REST API via rtweet"
+ )
+ # Relations between friends and followers of users
+ alltweets %>%
+   ggplot() +
+   aes(x = followers_count, y = friends_count) +
+   geom_point(size = 1L, colour = "#0c4c8a") +
+   theme_minimal()+
+ ggplot2::labs(
+   x = "Followers", y = "friends",
+   title = "Details about the friends and followers user based on collected data",
+   subtitle = "Determining users popularity based on collected data ",
+   caption = "\nSource: Data collected from Twitter's REST API via rtweet"
+ )
+ 
+ # relations between term frequency and word frequency
+ ggplot(word_topic_freq) +
+   aes(x = doc_freq, y = term_freq) +
+   geom_line(size = 1L, colour = "#0c4c8a") +
+   theme_minimal()+
+ ggplot2::labs(
+   x = "Document frequency", y = "Term frequency",
+   title = "Linear regression to predict terms as documentincreases",
+   subtitle = " This graph shows that the terms increase with increased documents ",
+   caption = "\nSource: Data collected from Twitter's REST API via rtweet"
+ )
+ 
+ ggplot(top40_wide) +
+   aes(x = t_7, y = t_8, fill = t_6, colour = t_9, group = t_10) +
+   geom_tile(size = 1L) +
+   scale_fill_hue() +
+   scale_color_hue() +
+   theme_minimal()
+ 
+ # Analysing the coerence of the topic with the k values
+ ggplot(coherence_mat) +
+   aes(x = coherence, y = k, colour = k, size = coherence) +
+   geom_point() +
+   scale_color_gradient() +
+   theme_minimal()+
+ ggplot2::labs(
+   x = "Coherence score", y = " Number of Topics",
+   title = "Coherence Score for Topics",
+   subtitle = " This graph shows that the coherence score increase with number of topics ",
+   caption = "\nSource: Data collected from Twitter's REST API via rtweet"
+ )
 # verifying that all variables in observation are complete
 count(alltweets,"user_id")
 count(alltweets)
@@ -569,6 +679,26 @@ alltweets %>%
   ggplot() +
   aes(x = followers_count, y = friends_count) +
   geom_point(size = 1L, colour = "#0c4c8a") +
+  theme_minimal()
+
+#•	"screen_name"
+#•	"text"
+#•	"reply_count"
+#•	"mentions_screen_name"
+#•	"is_retweet"
+#•	"country"
+#•	"followers_count"
+#•	"verified"
+alltweets %>%
+  ggplot() +
+  aes(x = retweet_followers_count, y = retweet_retweet_count) +
+  geom_point(size = 1L, colour = "#0c4c8a") +
+  theme_minimal()
+
+alltweets %>%
+  ggplot() +
+  aes(x = source, y = retweet_count) +
+  geom_boxplot(fill = "#0c4c8a") +
   theme_minimal()
 
 esquisse::esquisser()
