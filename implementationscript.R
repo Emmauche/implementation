@@ -7,9 +7,21 @@ install.packages(ggrepe)
 install.packages("esquisse") 
 install.packages("rvg")
 install.packages("officer")
+install.packages("RColorBrewer")
+install.packages("tidyr")
+install.packages("tidyverse")
+install.packages("ggplot2")
+install.packages("reshape2")
+install.packages("tidytext")
+install.packages("stringr")
+install.packages(readr)
+install.packages(wordcloud)
+install.packages(lubridate)
+install.packages(scales)
+install.packages(ggrepel)
 
 
-??esquisse
+library(RColorBrewer)
 library(rvg)
 library(esquisse)
 library(GGally)
@@ -83,7 +95,7 @@ ggplot(alltweets, aes(followers_count,retweet_count))+
 
 
   
-# continous variables
+# continuous variables
 str(alltweets)
 mean(alltweets$followers_count)
 mean(alltweets$reply_count)
@@ -416,14 +428,27 @@ legend("topright", legend = c("gibbs", "dot"), col = c("red", "blue"),
 
 
 #####Analysis
-b <- alltweets$favourites_count
-
-tweet<- final_summary_words
-
-
-
-alltweets.subset <- subset(alltweets, select = c(followers_count,retweet_count,screen_name))
-ggpairs(alltweets.subset)
+# All tweets gathered
+glimpse(alltweets)
+str(alltweets)
+#Relationship between retweet and status
+alltweets %>%
+  filter(!(country %in% "") | is.na(country)) %>%
+  filter(!(country_code %in% 
+             "") | is.na(country_code)) %>%
+  ggplot() +
+  aes(x = statuses_count, y = retweet_count) +
+  geom_point(size = 1L, colour = "#0c4c8a") +
+  theme_minimal()
+# Relationship between friends and the followers of users twitting
+alltweets %>%
+  filter(!(country %in% "") | is.na(country)) %>%
+  filter(!(country_code %in% 
+             "") | is.na(country_code)) %>%
+  ggplot() +
+  aes(x = followers_count, y = friends_count) +
+  geom_point(size = 1L, colour = "#0c4c8a") +
+  theme_minimal()
 
 
 # showing frequency of words 
@@ -487,5 +512,63 @@ plot(Volume$followers_count,Volume$retweet_count)
 
 
 #############################################################################
+
+esquisse::esquisser()
+
+
+library(dplyr)
+library(ggplot2)
+
+alltweets %>%
+ filter(!(country %in% "") | is.na(country)) %>%
+ filter(!(country_code %in% 
+    "") | is.na(country_code)) %>%
+ ggplot() +
+ aes(x = screen_name, y = followers_count) +
+ geom_point(size = 1L, colour = "#0c4c8a") +
+ theme_minimal()
+
+alltweets %>%
+ filter(!(country %in% "") | is.na(country)) %>%
+ filter(!(country_code %in% 
+    "") | is.na(country_code)) %>%
+ ggplot() +
+ aes(x = screen_name, y = followers_count) +
+ geom_point(size = 1L, colour = "#0c4c8a") +
+ theme_minimal()
+ggplot(final_summary_words) +
+  aes(x = topic, y = word, colour = topic) +
+  geom_tile(size = 1L) +
+  scale_color_hue() +
+  theme_minimal() +
+  facet_wrap(vars(topic))
+
+
+ggplot(final_summary_words) +
+ aes(x = topic, y = word, colour = topic) +
+ geom_tile(size = 1L) +
+ scale_color_hue() +
+ theme_minimal() +
+ facet_wrap(vars(topic))
+
+ggplot(coherence_mat) +
+  aes(x = k, y = coherence) +
+  geom_point(size = 1L, colour = "#0c4c8a") +
+  theme_minimal()
+
+ggplot(final_summary_words) +
+  aes(x = word, y = topic) +
+  geom_tile(size = 1L) +
+  theme_minimal()
+
+
+alltweets %>%
+  filter(!(country %in% "") | is.na(country)) %>%
+  filter(!(country_code %in% 
+             "") | is.na(country_code)) %>%
+  ggplot() +
+  aes(x = followers_count, y = friends_count) +
+  geom_point(size = 1L, colour = "#0c4c8a") +
+  theme_minimal()
 
 esquisse::esquisser()
